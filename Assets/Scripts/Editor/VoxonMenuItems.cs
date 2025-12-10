@@ -65,6 +65,32 @@ namespace Voxon.Editor
             Undo.RegisterCreatedObjectUndo(catFace, "Create Cat Face Controller");
         }
 
+        [MenuItem("Voxon/Create/Face Detection/WebCam Provider", false, 31)]
+        static void CreateWebCamFaceProvider()
+        {
+            GameObject faceDetector = GameObject.Find("FaceDetection");
+            if (faceDetector == null)
+            {
+                faceDetector = new GameObject("FaceDetection");
+            }
+            
+            FaceDetection.FaceDetector detector = faceDetector.GetComponent<FaceDetection.FaceDetector>();
+            if (detector == null)
+            {
+                detector = faceDetector.AddComponent<FaceDetection.FaceDetector>();
+            }
+            
+            // Add WebCam provider
+            FaceDetection.WebCamFaceProvider provider = faceDetector.GetComponent<FaceDetection.WebCamFaceProvider>();
+            if (provider == null)
+            {
+                provider = faceDetector.AddComponent<FaceDetection.WebCamFaceProvider>();
+            }
+            
+            Selection.activeGameObject = faceDetector;
+            Undo.RegisterCreatedObjectUndo(faceDetector, "Create WebCam Face Provider");
+        }
+
         [MenuItem("Voxon/Validate Scene Setup", false, 51)]
         static void ValidateSceneSetup()
         {
