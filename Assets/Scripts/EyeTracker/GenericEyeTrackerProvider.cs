@@ -65,11 +65,25 @@ namespace Voxon.EyeTracker
             Ray ray = targetCamera.ScreenPointToRay(mousePosition);
 
             currentGazeData.gazeOrigin = ray.origin;
-            currentGazeData.gazeDirection = ray.direction;
+            currentGazeData.gazeDirection = ray.direction.normalized;
             currentGazeData.timestamp = Time.time;
             currentGazeData.isValid = true;
 
             return currentGazeData;
+        }
+
+        /// <summary>
+        /// Get gaze data as screen coordinates (0-1 normalized)
+        /// </summary>
+        public Vector2 GetGazeScreenPosition()
+        {
+            if (!isConnected || targetCamera == null)
+            {
+                return Vector2.zero;
+            }
+
+            Vector3 mousePosition = Input.mousePosition;
+            return new Vector2(mousePosition.x / Screen.width, mousePosition.y / Screen.height);
         }
     }
 }
