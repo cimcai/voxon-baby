@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Voxon.FaceDetection;
+using ExpressionType = Voxon.CatFace.ExpressionType;
 
 namespace Voxon.LLM
 {

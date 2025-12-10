@@ -10,7 +10,7 @@ namespace Voxon.LLM
     [System.Serializable]
     public class ResponseEffectiveness
     {
-        public ExpressionType humanExpression;
+        public FaceDetection.ExpressionType humanExpression;
         public string catResponse;
         public int successCount;
         public int totalCount;
@@ -39,7 +39,7 @@ namespace Voxon.LLM
         /// <summary>
         /// Record the effectiveness of a response
         /// </summary>
-        public void RecordResponse(ExpressionType humanExpression, string catResponse, bool wasEffective)
+        public void RecordResponse(FaceDetection.ExpressionType humanExpression, string catResponse, bool wasEffective)
         {
             ResponseEffectiveness response = FindOrCreateResponse(humanExpression, catResponse);
             
@@ -55,7 +55,7 @@ namespace Voxon.LLM
         /// <summary>
         /// Get the best response for a given human expression
         /// </summary>
-        public string GetBestResponse(ExpressionType humanExpression)
+        public string GetBestResponse(FaceDetection.ExpressionType humanExpression)
         {
             ResponseEffectiveness bestResponse = null;
             float bestScore = -1f;
@@ -84,7 +84,7 @@ namespace Voxon.LLM
             return responseDatabase.Count >= minInteractionsForEvolution;
         }
 
-        private ResponseEffectiveness FindOrCreateResponse(ExpressionType humanExpression, string catResponse)
+        private ResponseEffectiveness FindOrCreateResponse(FaceDetection.ExpressionType humanExpression, string catResponse)
         {
             foreach (var response in responseDatabase)
             {

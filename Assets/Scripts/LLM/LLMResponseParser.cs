@@ -126,7 +126,12 @@ namespace Voxon.LLM
             Match match = Regex.Match(json, $@"""{key}""\s*:\s*([0-9.]+)", RegexOptions.IgnoreCase);
             if (match.Success && float.TryParse(match.Groups[1].Value, out float value))
             {
-                return Mathf.Clamp01(value);
+                // Only clamp intensity to 0-1, duration can be any positive value
+                if (key == "intensity")
+                {
+                    return Mathf.Clamp01(value);
+                }
+                return Mathf.Max(0f, value);
             }
             return defaultValue;
         }

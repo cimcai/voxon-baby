@@ -97,17 +97,17 @@ namespace Voxon.CatFace
         {
             if (expressionRecognizer == null) return;
 
-            ExpressionType humanExpression = expressionRecognizer.GetCurrentExpression();
+            FaceDetection.ExpressionType humanExpression = expressionRecognizer.GetCurrentExpression();
 
             switch (humanExpression)
             {
-                case ExpressionType.Happy:
+                case FaceDetection.ExpressionType.Happy:
                     expressionManager?.SetExpression(ExpressionType.Happy, 0.7f, 2f);
                     break;
-                case ExpressionType.Sad:
+                case FaceDetection.ExpressionType.Sad:
                     expressionManager?.SetExpression(ExpressionType.Sad, 0.6f, 2f);
                     break;
-                case ExpressionType.Surprised:
+                case FaceDetection.ExpressionType.Surprised:
                     expressionManager?.SetExpression(ExpressionType.Surprised, 0.8f, 1.5f);
                     break;
             }

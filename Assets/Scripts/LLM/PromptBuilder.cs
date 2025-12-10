@@ -44,7 +44,7 @@ namespace Voxon.LLM
             // Current human expression
             if (expressionRecognizer != null)
             {
-                ExpressionType currentExpression = expressionRecognizer.GetCurrentExpression();
+                FaceDetection.ExpressionType currentExpression = expressionRecognizer.GetCurrentExpression();
                 prompt.AppendLine($"Current human expression: {currentExpression}");
             }
 

@@ -1,7 +1,6 @@
 using UnityEngine;
 using Voxon.LLM;
 using Voxon.FaceDetection;
-using HumanExpressionType = Voxon.FaceDetection.ExpressionType;
 
 namespace Voxon.CatFace
 {
@@ -88,31 +87,33 @@ namespace Voxon.CatFace
                 if (contextManager != null)
                 {
                     ExpressionRecognizer recognizer = FindObjectOfType<ExpressionRecognizer>();
-                    HumanExpressionType humanExpression = recognizer != null ? recognizer.GetCurrentExpression() : HumanExpressionType.Neutral;
-                    contextManager.AddInteraction(humanExpression, catExpression.ToString(), llmResponse.reasoning);
+                    FaceDetection.ExpressionType humanExpression = recognizer != null ? recognizer.GetCurrentExpression() : FaceDetection.ExpressionType.Neutral;
+                    // Map human expression to cat expression for context
+                    ExpressionType mappedCatExpression = MapToCatExpression(humanExpression);
+                    contextManager.AddInteraction(mappedCatExpression, catExpression.ToString(), llmResponse.reasoning);
                 }
             }
         }
 
-        private ExpressionType MapToCatExpression(HumanExpressionType llmExpression)
+        private ExpressionType MapToCatExpression(FaceDetection.ExpressionType llmExpression)
         {
             // Map human expression types to cat expression types
             // Some expressions map directly, others need translation
             switch (llmExpression)
             {
-                case HumanExpressionType.Happy:
+                case FaceDetection.ExpressionType.Happy:
                     return ExpressionType.Happy;
-                case HumanExpressionType.Sad:
+                case FaceDetection.ExpressionType.Sad:
                     return ExpressionType.Sad;
-                case HumanExpressionType.Surprised:
+                case FaceDetection.ExpressionType.Surprised:
                     return ExpressionType.Surprised;
-                case HumanExpressionType.Neutral:
+                case FaceDetection.ExpressionType.Neutral:
                     return ExpressionType.Neutral;
-                case HumanExpressionType.Excited:
+                case FaceDetection.ExpressionType.Excited:
                     return ExpressionType.Playful;
-                case HumanExpressionType.Confused:
+                case FaceDetection.ExpressionType.Confused:
                     return ExpressionType.Curious;
-                case HumanExpressionType.Angry:
+                case FaceDetection.ExpressionType.Angry:
                     return ExpressionType.Sad; // Cat shows concern for angry human
                 default:
                     return ExpressionType.Neutral;
