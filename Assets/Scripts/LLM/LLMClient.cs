@@ -94,25 +94,27 @@ namespace Voxon.LLM
             // Build JSON request body based on provider
             if (provider == LLMProvider.OpenAI)
             {
-                return $@"{{
-                    ""model"": ""{model}"",
-                    ""messages"": [
-                        {{""role"": ""system"", ""content"": ""You are a helpful assistant that helps determine cat facial expressions based on human emotions and interactions."}},
-                        {{""role"": ""user"", ""content"": ""{EscapeJson(prompt)}""}}
-                    ],
-                    ""temperature"": 0.7,
-                    ""max_tokens"": 150
-                }}";
+                string escapedPrompt = EscapeJson(prompt);
+                return "{\n" +
+                    "    \"model\": \"" + model + "\",\n" +
+                    "    \"messages\": [\n" +
+                    "        {\"role\": \"system\", \"content\": \"You are a helpful assistant that helps determine cat facial expressions based on human emotions and interactions.\"},\n" +
+                    "        {\"role\": \"user\", \"content\": \"" + escapedPrompt + "\"}\n" +
+                    "    ],\n" +
+                    "    \"temperature\": 0.7,\n" +
+                    "    \"max_tokens\": 150\n" +
+                    "}";
             }
             else if (provider == LLMProvider.Anthropic)
             {
-                return $@"{{
-                    ""model"": ""{model}"",
-                    ""max_tokens"": 150,
-                    ""messages"": [
-                        {{""role"": ""user"", ""content"": ""{EscapeJson(prompt)}""}}
-                    ]
-                }}";
+                string escapedPrompt = EscapeJson(prompt);
+                return "{\n" +
+                    "    \"model\": \"" + model + "\",\n" +
+                    "    \"max_tokens\": 150,\n" +
+                    "    \"messages\": [\n" +
+                    "        {\"role\": \"user\", \"content\": \"" + escapedPrompt + "\"}\n" +
+                    "    ]\n" +
+                    "}";
             }
 
             return "";
