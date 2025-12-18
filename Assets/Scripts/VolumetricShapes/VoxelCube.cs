@@ -1,4 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Voxon.VolumetricShapes
 {
@@ -15,6 +18,44 @@ namespace Voxon.VolumetricShapes
             base.Awake();
             CreateCubeMesh();
         }
+
+        private void Reset()
+        {
+            // Called when component is first added or reset in editor
+            CreateCubeMesh();
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
+#endif
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            // Ensure mesh exists in editor
+            if (!Application.isPlaying)
+            {
+                MeshFilter mf = GetComponent<MeshFilter>();
+                MeshRenderer mr = GetComponent<MeshRenderer>();
+                if (mf == null || mr == null || mf.sharedMesh == null)
+                {
+                    CreateCubeMesh();
+                }
+            }
+        }
+        
+        private void OnEnable()
+        {
+            // Ensure components exist when enabled in editor
+            if (!Application.isPlaying)
+            {
+                if (GetComponent<MeshFilter>() == null || GetComponent<MeshRenderer>() == null)
+                {
+                    CreateCubeMesh();
+                }
+            }
+        }
+#endif
 
         private void CreateCubeMesh()
         {
@@ -34,20 +75,45 @@ namespace Voxon.VolumetricShapes
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Mesh cubeMesh = cube.GetComponent<MeshFilter>().sharedMesh;
             meshFilter.mesh = cubeMesh;
+            
+            // Copy material before destroying
+            Material cubeMaterial = cube.GetComponent<MeshRenderer>().sharedMaterial;
+            if (cubeMaterial != null)
+            {
+                meshRenderer.material = new Material(cubeMaterial);
+            }
+            else
+            {
+                // Create a default material if none exists
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+                meshRenderer.material.color = baseColor;
+            }
+            
             DestroyImmediate(cube);
 
             // Apply size
             transform.localScale = dimensions * size;
+            
+            // Position cube in front of camera if at origin (only in editor)
+#if UNITY_EDITOR
+            if (!Application.isPlaying && transform.position == Vector3.zero)
+            {
+                UnityEngine.Camera sceneViewCam = UnityEditor.SceneView.lastActiveSceneView?.camera;
+                if (sceneViewCam != null)
+                {
+                    Vector3 forward = sceneViewCam.transform.forward;
+                    forward.y = 0; // Keep on ground
+                    forward.Normalize();
+                    transform.position = forward * 3f;
+                }
+                else
+                {
+                    transform.position = new Vector3(0, 0, 3f);
+                }
+            }
+#endif
         }
 
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (Application.isPlaying && GetComponent<MeshFilter>() != null)
-            {
-                transform.localScale = dimensions * size;
-            }
-        }
     }
 }
 

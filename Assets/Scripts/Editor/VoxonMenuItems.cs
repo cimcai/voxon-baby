@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using Voxon.EyeTracker;
 using Voxon.VolumetricShapes;
 using Voxon.CatFace;
@@ -14,10 +15,41 @@ namespace Voxon.Editor
         [MenuItem("Voxon/Create/Voxel Cube", false, 1)]
         static void CreateVoxelCube()
         {
-            GameObject cube = new GameObject("VoxelCube");
-            cube.AddComponent<VoxelCube>();
+            // Use Unity's CreatePrimitive to get a cube with all components
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.name = "VoxelCube";
+            
+            // Add VoxelCube component (VolumetricShape requires Collider, which CreatePrimitive already added)
+            VoxelCube voxelCube = cube.AddComponent<VoxelCube>();
+            
+            // Position cube in front of camera
+            UnityEngine.Camera mainCam = UnityEngine.Camera.main;
+            if (mainCam != null)
+            {
+                Vector3 pos = mainCam.transform.position + mainCam.transform.forward * 3f;
+                pos.y = 0; // Keep on ground level
+                cube.transform.position = pos;
+            }
+            else
+            {
+                cube.transform.position = new Vector3(0, 0, 3f);
+            }
+            
             Selection.activeGameObject = cube;
             Undo.RegisterCreatedObjectUndo(cube, "Create Voxel Cube");
+            
+            // Force refresh
+            EditorUtility.SetDirty(cube);
+            if (cube.scene.IsValid())
+            {
+                EditorSceneManager.MarkSceneDirty(cube.scene);
+            }
+            
+            Debug.Log("VoxelCube created with components: " + 
+                (cube.GetComponent<MeshFilter>() != null ? "MeshFilter ✓ " : "MeshFilter ✗ ") +
+                (cube.GetComponent<MeshRenderer>() != null ? "MeshRenderer ✓ " : "MeshRenderer ✗ ") +
+                (cube.GetComponent<Collider>() != null ? "Collider ✓ " : "Collider ✗ ") +
+                (cube.GetComponent<VoxelCube>() != null ? "VoxelCube ✓" : "VoxelCube ✗"));
         }
 
         [MenuItem("Voxon/Create/Voxel Sphere", false, 2)]
@@ -56,6 +88,31 @@ namespace Voxon.Editor
             Undo.RegisterCreatedObjectUndo(manager, "Create Eye Tracker Manager");
         }
 
+        [MenuItem("Voxon/Create/Gaze Detection", false, 12)]
+        static void CreateGazeDetection()
+        {
+            GameObject gazeDetection = GameObject.Find("GazeDetection");
+            if (gazeDetection == null)
+            {
+                gazeDetection = new GameObject("GazeDetection");
+            }
+            
+            GazeDetection.GazeRaycast gazeRaycast = gazeDetection.GetComponent<GazeDetection.GazeRaycast>();
+            if (gazeRaycast == null)
+            {
+                gazeRaycast = gazeDetection.AddComponent<GazeDetection.GazeRaycast>();
+            }
+            
+            GazeDetection.GazeHitDetector hitDetector = gazeDetection.GetComponent<GazeDetection.GazeHitDetector>();
+            if (hitDetector == null)
+            {
+                hitDetector = gazeDetection.AddComponent<GazeDetection.GazeHitDetector>();
+            }
+            
+            Selection.activeGameObject = gazeDetection;
+            Undo.RegisterCreatedObjectUndo(gazeDetection, "Create Gaze Detection");
+        }
+
         [MenuItem("Voxon/Create/Cat Face Controller", false, 21)]
         static void CreateCatFaceController()
         {
@@ -85,6 +142,13 @@ namespace Voxon.Editor
             if (provider == null)
             {
                 provider = faceDetector.AddComponent<FaceDetection.WebCamFaceProvider>();
+            }
+            
+            // Add Expression Recognizer
+            FaceDetection.ExpressionRecognizer recognizer = faceDetector.GetComponent<FaceDetection.ExpressionRecognizer>();
+            if (recognizer == null)
+            {
+                recognizer = faceDetector.AddComponent<FaceDetection.ExpressionRecognizer>();
             }
             
             Selection.activeGameObject = faceDetector;
