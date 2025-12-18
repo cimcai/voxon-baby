@@ -11,7 +11,7 @@ namespace Voxon.GazeDetection
         [Header("Raycast Settings")]
         [SerializeField] private float maxRaycastDistance = 100f;
         [SerializeField] private LayerMask raycastLayerMask = -1;
-        [SerializeField] private Camera targetCamera;
+        [SerializeField] private UnityEngine.Camera targetCamera;
 
         private EyeTrackerManager eyeTrackerManager;
 
@@ -21,7 +21,7 @@ namespace Voxon.GazeDetection
             
             if (targetCamera == null)
             {
-                targetCamera = Camera.main;
+                targetCamera = UnityEngine.Camera.main;
             }
         }
 

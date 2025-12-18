@@ -109,8 +109,8 @@ namespace Voxon.EyeTracker.ExampleProviders
                 
                 // Placeholder - replace with actual Tobii data
                 GazeData gazeData = new GazeData();
-                gazeData.gazeOrigin = Camera.main.transform.position;
-                gazeData.gazeDirection = Camera.main.transform.forward;
+                gazeData.gazeOrigin = UnityEngine.Camera.main.transform.position;
+                gazeData.gazeDirection = UnityEngine.Camera.main.transform.forward;
                 gazeData.timestamp = Time.time;
                 gazeData.isValid = true;
 
@@ -123,7 +123,7 @@ namespace Voxon.EyeTracker.ExampleProviders
             }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             Disconnect();
         }

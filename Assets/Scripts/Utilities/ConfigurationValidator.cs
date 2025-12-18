@@ -51,7 +51,7 @@ namespace Voxon.Utilities
             }
 
             // Validate Camera
-            Camera mainCam = Camera.main;
+            UnityEngine.Camera mainCam = UnityEngine.Camera.main;
             if (mainCam == null)
             {
                 report.AppendLine("❌ ERROR: Main Camera not found");

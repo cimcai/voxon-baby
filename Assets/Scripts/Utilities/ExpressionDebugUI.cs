@@ -51,7 +51,7 @@ namespace Voxon.Utilities
             // Cat Face Expression
             if (catFaceController != null)
             {
-                ExpressionType catExpression = catFaceController.GetCurrentExpression();
+                CatFace.ExpressionType catExpression = catFaceController.GetCurrentExpression();
                 GUI.Label(new Rect(uiPosition.x, yOffset, 300, lineHeight), 
                     $"Cat Expression: {catExpression}", style);
                 yOffset += lineHeight;

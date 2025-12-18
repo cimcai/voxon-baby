@@ -27,7 +27,7 @@ namespace Voxon.FaceDetection.MLProviders
         [Header("Azure Settings")]
         [SerializeField] private string apiKey = "";
         [SerializeField] private string apiEndpoint = "https://[your-region].api.cognitive.microsoft.com/face/v1.0";
-        [SerializeField] private Camera sourceCamera;
+        [SerializeField] private UnityEngine.Camera sourceCamera;
         [SerializeField] private int targetFPS = 10; // Lower for API calls
         [SerializeField] private float confidenceThreshold = 0.5f;
 
@@ -53,7 +53,7 @@ namespace Voxon.FaceDetection.MLProviders
 
                 if (sourceCamera == null)
                 {
-                    sourceCamera = Camera.main;
+                    sourceCamera = UnityEngine.Camera.main;
                 }
 
                 if (sourceCamera == null)
@@ -112,60 +112,80 @@ namespace Voxon.FaceDetection.MLProviders
         {
             isRequestInProgress = true;
 
+            // Capture camera frame
+            RenderTexture renderTexture = null;
+            Texture2D frameTexture = null;
+            byte[] imageData = null;
+
             try
             {
-                // Capture camera frame
-                RenderTexture renderTexture = sourceCamera.targetTexture ?? new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 24);
+                renderTexture = sourceCamera.targetTexture ?? new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 24);
                 if (sourceCamera.targetTexture == null)
                 {
                     sourceCamera.targetTexture = renderTexture;
                 }
 
-                Texture2D frameTexture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+                frameTexture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
                 RenderTexture.active = renderTexture;
                 frameTexture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
                 frameTexture.Apply();
                 RenderTexture.active = null;
 
                 // Convert to JPEG for API
-                byte[] imageData = frameTexture.EncodeToJPG();
-                Destroy(frameTexture);
-
-                // Build API request
-                string detectUrl = $"{apiEndpoint}/detect";
-                string features = "emotion";
-                if (detectLandmarks) features += ",faceLandmarks";
-                if (detectAttributes) features += ",age,gender";
-                
-                detectUrl += $"?returnFaceAttributes={features}&returnFaceLandmarks={detectLandmarks}";
-
-                using (UnityWebRequest request = new UnityWebRequest(detectUrl, "POST"))
-                {
-                    request.uploadHandler = new UploadHandlerRaw(imageData);
-                    request.downloadHandler = new DownloadHandlerBuffer();
-                    request.SetRequestHeader("Content-Type", "application/octet-stream");
-                    request.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
-
-                    yield return request.SendWebRequest();
-
-                    if (request.result == UnityWebRequest.Result.Success)
-                    {
-                        ProcessAzureResponse(request.downloadHandler.text);
-                    }
-                    else
-                    {
-                        Debug.LogError($"Azure Face API Error: {request.error}");
-                    }
-                }
+                imageData = frameTexture.EncodeToJPG();
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Error in Azure face detection: {e.Message}");
-            }
-            finally
-            {
+                Debug.LogError($"Error capturing frame for Azure face detection: {e.Message}");
+                if (frameTexture != null) Destroy(frameTexture);
                 isRequestInProgress = false;
+                yield break;
             }
+
+            if (imageData == null)
+            {
+                if (frameTexture != null) Destroy(frameTexture);
+                isRequestInProgress = false;
+                yield break;
+            }
+
+            // Build API request
+            string detectUrl = $"{apiEndpoint}/detect";
+            string features = "emotion";
+            if (detectLandmarks) features += ",faceLandmarks";
+            if (detectAttributes) features += ",age,gender";
+            
+            detectUrl += $"?returnFaceAttributes={features}&returnFaceLandmarks={detectLandmarks}";
+
+            using (UnityWebRequest request = new UnityWebRequest(detectUrl, "POST"))
+            {
+                request.uploadHandler = new UploadHandlerRaw(imageData);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/octet-stream");
+                request.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
+
+                yield return request.SendWebRequest();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    try
+                    {
+                        ProcessAzureResponse(request.downloadHandler.text);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError($"Error processing Azure response: {e.Message}");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"Azure Face API Error: {request.error}");
+                }
+            }
+
+            // Cleanup
+            if (frameTexture != null) Destroy(frameTexture);
+            isRequestInProgress = false;
         }
 
         private void ProcessAzureResponse(string jsonResponse)
@@ -218,7 +238,7 @@ namespace Voxon.FaceDetection.MLProviders
             return ExpressionType.Neutral;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             StopDetection();
         }

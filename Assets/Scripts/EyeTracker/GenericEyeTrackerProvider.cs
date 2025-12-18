@@ -10,7 +10,7 @@ namespace Voxon.EyeTracker
     public class GenericEyeTrackerProvider : EyeTrackerProvider
     {
         [Header("Simulation Settings")]
-        [SerializeField] private Camera targetCamera;
+        [SerializeField] private UnityEngine.Camera targetCamera;
         [SerializeField] private float maxRaycastDistance = 100f;
         [SerializeField] private LayerMask raycastLayerMask = -1;
 
@@ -20,7 +20,7 @@ namespace Voxon.EyeTracker
         {
             if (targetCamera == null)
             {
-                targetCamera = Camera.main;
+                targetCamera = UnityEngine.Camera.main;
                 if (targetCamera == null)
                 {
                     Debug.LogError("No camera found. Cannot initialize GenericEyeTrackerProvider.");

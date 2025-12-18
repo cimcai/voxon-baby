@@ -42,7 +42,8 @@ namespace Voxon.Utilities
         {
             lineRenderer = gameObject.AddComponent<LineRenderer>();
             lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            lineRenderer.color = gazeRayColor;
+            lineRenderer.startColor = gazeRayColor;
+            lineRenderer.endColor = gazeRayColor;
             lineRenderer.startWidth = rayWidth;
             lineRenderer.endWidth = rayWidth;
             lineRenderer.useWorldSpace = true;

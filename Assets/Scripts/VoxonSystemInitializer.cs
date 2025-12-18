@@ -5,6 +5,7 @@ using Voxon.FaceDetection;
 using Voxon.LLM;
 using Voxon.CatFace;
 using Voxon.VolumetricShapes;
+using Voxon.Camera;
 
 namespace Voxon
 {
@@ -75,11 +76,11 @@ namespace Voxon
 
         private void SetupCamera()
         {
-            Camera mainCamera = Camera.main;
+            UnityEngine.Camera mainCamera = UnityEngine.Camera.main;
             if (mainCamera == null)
             {
                 GameObject cameraObj = new GameObject("Main Camera");
-                mainCamera = cameraObj.AddComponent<Camera>();
+                mainCamera = cameraObj.AddComponent<UnityEngine.Camera>();
                 cameraObj.tag = "MainCamera";
             }
 

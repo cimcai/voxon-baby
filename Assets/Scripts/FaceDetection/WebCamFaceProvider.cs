@@ -166,7 +166,7 @@ namespace Voxon.FaceDetection
                 // Get current frame
                 if (snapshotTexture.width != webCamTexture.width || snapshotTexture.height != webCamTexture.height)
                 {
-                    snapshotTexture.Resize(webCamTexture.width, webCamTexture.height);
+                    snapshotTexture.Reinitialize(webCamTexture.width, webCamTexture.height);
                 }
 
                 snapshotTexture.SetPixels(webCamTexture.GetPixels());
@@ -184,7 +184,7 @@ namespace Voxon.FaceDetection
                     currentExpression.facePosition = EstimateFacePosition();
                     currentExpression.faceRotation = EstimateFaceRotation();
                     
-                    OnExpressionDetected?.Invoke(currentExpression);
+                    InvokeExpressionDetected(currentExpression);
                     lastDetectedExpression = detectedExpression;
                     lastExpressionChangeTime = Time.time;
                 }
@@ -293,7 +293,7 @@ namespace Voxon.FaceDetection
             return Quaternion.identity; // Placeholder
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             StopDetection();
 

@@ -15,7 +15,7 @@ namespace Voxon.FaceDetection.ExampleProviders
     public class MediaPipeFaceProvider : FaceDetectionProvider
     {
         [Header("MediaPipe Settings")]
-        [SerializeField] private Camera sourceCamera;
+        [SerializeField] private UnityEngine.Camera sourceCamera;
         [SerializeField] private int targetFPS = 30;
         [SerializeField] private float confidenceThreshold = 0.5f;
 
@@ -33,7 +33,7 @@ namespace Voxon.FaceDetection.ExampleProviders
             {
                 if (sourceCamera == null)
                 {
-                    sourceCamera = Camera.main;
+                    sourceCamera = UnityEngine.Camera.main;
                 }
 
                 if (sourceCamera == null)
@@ -138,7 +138,7 @@ namespace Voxon.FaceDetection.ExampleProviders
             return ExpressionType.Neutral;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             StopDetection();
         }

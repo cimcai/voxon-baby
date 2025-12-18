@@ -65,7 +65,7 @@ namespace Voxon.FaceDetection
                     float intensity = Random.Range(0.3f, 1f);
 
                     currentExpression = new HumanExpressionData(randomExpression, confidence, intensity);
-                    OnExpressionDetected?.Invoke(currentExpression);
+                    InvokeExpressionDetected(currentExpression);
                 }
 
                 yield return new WaitForSeconds(updateInterval);

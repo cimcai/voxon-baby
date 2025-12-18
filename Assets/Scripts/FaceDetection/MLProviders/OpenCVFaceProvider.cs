@@ -23,7 +23,7 @@ namespace Voxon.FaceDetection.MLProviders
     public class OpenCVFaceProvider : FaceDetectionProvider
     {
         [Header("OpenCV Settings")]
-        [SerializeField] private Camera sourceCamera;
+        [SerializeField] private UnityEngine.Camera sourceCamera;
         [SerializeField] private int targetFPS = 30;
         [SerializeField] private float confidenceThreshold = 0.5f;
         [SerializeField] private bool useDNNModel = true;
@@ -53,7 +53,7 @@ namespace Voxon.FaceDetection.MLProviders
             {
                 if (sourceCamera == null)
                 {
-                    sourceCamera = Camera.main;
+                    sourceCamera = UnityEngine.Camera.main;
                 }
 
                 if (sourceCamera == null)
@@ -219,7 +219,7 @@ namespace Voxon.FaceDetection.MLProviders
             return ExpressionType.Neutral;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             StopDetection();
             

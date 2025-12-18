@@ -147,10 +147,6 @@ namespace Voxon.Utilities
             }
         }
 
-        private T FindObjectOfType<T>() where T : MonoBehaviour
-        {
-            return Object.FindObjectOfType<T>();
-        }
     }
 }
 

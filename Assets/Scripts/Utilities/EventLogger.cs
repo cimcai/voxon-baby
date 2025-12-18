@@ -104,7 +104,7 @@ namespace Voxon.Utilities
             Log("EyeTracker", connected ? "Connected" : "Disconnected", "");
         }
 
-        private void OnCatExpressionChanged(ExpressionType expression)
+        private void OnCatExpressionChanged(CatFace.ExpressionType expression)
         {
             Log("CatExpression", $"Expression changed to {expression}", "");
         }

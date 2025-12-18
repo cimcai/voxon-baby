@@ -11,7 +11,7 @@ namespace Voxon.Utilities
     {
         [Header("Testing Settings")]
         [SerializeField] private KeyCode nextExpressionKey = KeyCode.E;
-        [SerializeField] [SerializeField] private KeyCode previousExpressionKey = KeyCode.Q;
+        [SerializeField] private KeyCode previousExpressionKey = KeyCode.Q;
         [SerializeField] private float expressionDuration = 3f;
         [SerializeField] private bool autoCycle = false;
         [SerializeField] private float autoCycleInterval = 3f;

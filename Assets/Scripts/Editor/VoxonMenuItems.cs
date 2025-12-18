@@ -111,7 +111,7 @@ namespace Voxon.Editor
             }
 
             // Check Camera
-            Camera mainCam = Camera.main;
+            UnityEngine.Camera mainCam = UnityEngine.Camera.main;
             if (mainCam == null)
             {
                 report.AppendLine("⚠ Missing: Main Camera");

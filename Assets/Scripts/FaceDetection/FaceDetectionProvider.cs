@@ -44,6 +44,14 @@ namespace Voxon.FaceDetection
         /// </summary>
         public bool IsInitialized => isInitialized;
 
+        /// <summary>
+        /// Invoke expression detected event (protected so derived classes can call it)
+        /// </summary>
+        protected void InvokeExpressionDetected(HumanExpressionData expressionData)
+        {
+            OnExpressionDetected?.Invoke(expressionData);
+        }
+
         protected virtual void OnDestroy()
         {
             StopDetection();
