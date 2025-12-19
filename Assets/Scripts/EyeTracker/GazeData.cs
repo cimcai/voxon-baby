@@ -18,7 +18,7 @@ namespace Voxon.EyeTracker
         {
             gazeOrigin = Vector3.zero;
             gazeDirection = Vector3.forward;
-            timestamp = Time.time;
+            timestamp = Application.isPlaying ? Time.time : 0f;
             isValid = false;
         }
 
@@ -26,7 +26,7 @@ namespace Voxon.EyeTracker
         {
             gazeOrigin = origin;
             gazeDirection = direction.normalized;
-            timestamp = Time.time;
+            timestamp = Application.isPlaying ? Time.time : 0f;
             isValid = valid;
         }
     }

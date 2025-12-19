@@ -359,6 +359,7 @@
 "Assets/Scripts/CatFace/ExpressionTypes.cs"
 "Assets/Scripts/CatFace/GazeInteractionHandler.cs"
 "Assets/Scripts/CatFace/LLMExpressionMapper.cs"
+"Assets/Scripts/EyeTracker/ExampleProviders/PupilLabsEyeTrackerProvider.cs"
 "Assets/Scripts/EyeTracker/ExampleProviders/TobiiEyeTrackerProvider.cs"
 "Assets/Scripts/EyeTracker/EyeTrackerManager.cs"
 "Assets/Scripts/EyeTracker/EyeTrackerProvider.cs"

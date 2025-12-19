@@ -220,7 +220,7 @@ namespace Voxon.FaceDetection
             // For now, simulate based on time and random factors
             // In production, replace this with actual ML analysis
             
-            float timeFactor = Mathf.Sin(Time.time * 0.5f);
+            float timeFactor = Application.isPlaying ? Mathf.Sin(Time.time * 0.5f) : 0f;
             float randomFactor = Random.Range(-0.3f, 0.3f);
             float combined = timeFactor + randomFactor;
 
@@ -246,7 +246,7 @@ namespace Voxon.FaceDetection
             }
 
             // Update if enough time passed (for stability)
-            if (Time.time - lastExpressionChangeTime > expressionStabilityTime)
+            if (Application.isPlaying && Time.time - lastExpressionChangeTime > expressionStabilityTime)
             {
                 return true;
             }
