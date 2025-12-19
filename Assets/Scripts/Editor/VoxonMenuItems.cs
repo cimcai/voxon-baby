@@ -141,10 +141,29 @@ namespace Voxon.Editor
         [MenuItem("Voxon/Create/Cat Face Controller", false, 21)]
         static void CreateCatFaceController()
         {
-            GameObject catFace = new GameObject("CatFace");
-            catFace.AddComponent<CatFaceController>();
+            GameObject catFace = GameObject.Find("CatFace");
+            if (catFace == null)
+            {
+                catFace = new GameObject("CatFace");
+            }
+            
+            CatFaceController controller = catFace.GetComponent<CatFaceController>();
+            if (controller == null)
+            {
+                controller = catFace.AddComponent<CatFaceController>();
+            }
+            
+            // Add SimpleCatFace for visual representation
+            SimpleCatFace simpleCat = catFace.GetComponent<SimpleCatFace>();
+            if (simpleCat == null)
+            {
+                simpleCat = catFace.AddComponent<SimpleCatFace>();
+            }
+            
             Selection.activeGameObject = catFace;
             Undo.RegisterCreatedObjectUndo(catFace, "Create Cat Face Controller");
+            EditorSceneManager.MarkSceneDirty(catFace.scene);
+            Debug.Log("Cat Face Controller created with SimpleCatFace placeholder. The cat should be visible in the scene!");
         }
 
         [MenuItem("Voxon/Create/Face Detection/WebCam Provider", false, 31)]

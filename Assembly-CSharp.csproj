@@ -97,6 +97,7 @@
     <Compile Include="Assets/Scripts/CatFace/ExpressionTriggers.cs" />
     <Compile Include="Assets/Scripts/LLM/LLMClient.cs" />
     <Compile Include="Assets/Scripts/CatFace/ExpressionManager.cs" />
+    <Compile Include="Assets/Scripts/CatFace/SimpleCatFace.cs" />
     <Compile Include="Assets/Scripts/FaceDetection/ExpressionRecognizer.cs" />
     <Compile Include="Assets/Scripts/Utilities/LLMTestClient.cs" />
     <Compile Include="Assets/Scripts/VolumetricShapes/VoxelCylinder.cs" />
