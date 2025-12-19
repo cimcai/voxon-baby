@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Voxon.VolumetricShapes;
+using Voxon.Highlighting;
 
 namespace Voxon.GazeDetection
 {
@@ -10,8 +11,9 @@ namespace Voxon.GazeDetection
     public class GazeHitDetector : MonoBehaviour
     {
         [Header("Detection Settings")]
-        [SerializeField] private float focusDwellTime = 0.5f;
+        [SerializeField] private float focusDwellTime = 0.2f; // Reduced for faster feedback
         [SerializeField] private float unfocusTime = 0.2f;
+        [SerializeField] private bool debugLogging = false;
 
         private GazeRaycast gazeRaycast;
         private VolumetricShape currentFocusedShape;
@@ -70,6 +72,11 @@ namespace Voxon.GazeDetection
                 isFocused = false;
                 OnShapeFocused?.Invoke(shape);
                 shape.SetFocused(true);
+                
+                if (debugLogging)
+                {
+                    Debug.Log($"GazeHitDetector: Focused on {shape.name}. Has HighlightController: {shape.GetComponent<HighlightController>() != null}");
+                }
             }
             else
             {
@@ -79,6 +86,11 @@ namespace Voxon.GazeDetection
                     isFocused = true;
                     OnShapeHighlighted?.Invoke(shape);
                     shape.SetHighlighted(true);
+                    
+                    if (debugLogging)
+                    {
+                        Debug.Log($"GazeHitDetector: Highlighted {shape.name} after {Time.time - focusStartTime:F2}s");
+                    }
                 }
             }
         }

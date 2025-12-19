@@ -23,6 +23,13 @@ namespace Voxon.Highlighting
             InitializeEffects();
         }
 
+        private void Start()
+        {
+            // Re-initialize effects in Start in case components were added after Awake
+            // This ensures ColorHighlight gets the material that might be created in VoxelCube.Start()
+            InitializeEffects();
+        }
+
         private void InitializeEffects()
         {
             // Add effects based on settings
@@ -63,9 +70,26 @@ namespace Voxon.Highlighting
         public void SetFocused(bool focused)
         {
             isFocused = focused;
-            if (!focused && !isHighlighted)
+            if (focused && !isHighlighted)
+            {
+                // Show subtle highlight immediately when focused (before full highlight)
+                ApplyFocusedHighlight();
+            }
+            else if (!focused && !isHighlighted)
             {
                 RemoveAllHighlights();
+            }
+        }
+
+        private void ApplyFocusedHighlight()
+        {
+            // Apply a subtle highlight (50% intensity) when focused
+            foreach (var effect in highlightEffects)
+            {
+                if (effect != null)
+                {
+                    effect.ApplyHighlight(highlightIntensity * 0.5f);
+                }
             }
         }
 

@@ -4,6 +4,8 @@ using UnityEditor.SceneManagement;
 using Voxon.EyeTracker;
 using Voxon.VolumetricShapes;
 using Voxon.CatFace;
+using Voxon.GazeDetection;
+using Voxon.Utilities;
 
 namespace Voxon.Editor
 {
@@ -97,20 +99,43 @@ namespace Voxon.Editor
                 gazeDetection = new GameObject("GazeDetection");
             }
             
-            GazeDetection.GazeRaycast gazeRaycast = gazeDetection.GetComponent<GazeDetection.GazeRaycast>();
+            GazeRaycast gazeRaycast = gazeDetection.GetComponent<GazeRaycast>();
             if (gazeRaycast == null)
             {
-                gazeRaycast = gazeDetection.AddComponent<GazeDetection.GazeRaycast>();
+                gazeRaycast = gazeDetection.AddComponent<GazeRaycast>();
             }
             
-            GazeDetection.GazeHitDetector hitDetector = gazeDetection.GetComponent<GazeDetection.GazeHitDetector>();
+            GazeHitDetector hitDetector = gazeDetection.GetComponent<GazeHitDetector>();
             if (hitDetector == null)
             {
-                hitDetector = gazeDetection.AddComponent<GazeDetection.GazeHitDetector>();
+                hitDetector = gazeDetection.AddComponent<GazeHitDetector>();
             }
             
             Selection.activeGameObject = gazeDetection;
             Undo.RegisterCreatedObjectUndo(gazeDetection, "Create Gaze Detection");
+            EditorSceneManager.MarkSceneDirty(gazeDetection.scene);
+            Debug.Log("Gaze Detection system created. Components: GazeRaycast ✓, GazeHitDetector ✓");
+        }
+
+        [MenuItem("Voxon/Create/Gaze Debugger", false, 13)]
+        static void CreateGazeDebugger()
+        {
+            GameObject debugger = GameObject.Find("GazeDebugger");
+            if (debugger == null)
+            {
+                debugger = new GameObject("GazeDebugger");
+            }
+            
+            GazeDebugger gazeDebugger = debugger.GetComponent<GazeDebugger>();
+            if (gazeDebugger == null)
+            {
+                gazeDebugger = debugger.AddComponent<GazeDebugger>();
+            }
+            
+            Selection.activeGameObject = debugger;
+            Undo.RegisterCreatedObjectUndo(debugger, "Create Gaze Debugger");
+            EditorSceneManager.MarkSceneDirty(debugger.scene);
+            Debug.Log("Gaze Debugger created. Check console for diagnostics when playing.");
         }
 
         [MenuItem("Voxon/Create/Cat Face Controller", false, 21)]

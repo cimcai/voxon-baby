@@ -36,7 +36,7 @@ namespace Voxon.FaceDetection
         {
             expressionType = ExpressionType.Neutral;
             confidence = 0f;
-            timestamp = Application.isPlaying ? Time.time : 0f;
+            timestamp = 0f; // Set during runtime, not during serialization
             intensity = 0f;
             facePosition = Vector3.zero;
             faceRotation = Quaternion.identity;
@@ -47,7 +47,16 @@ namespace Voxon.FaceDetection
         {
             expressionType = type;
             confidence = conf;
-            timestamp = Application.isPlaying ? Time.time : 0f;
+            // Only set timestamp if actually playing (not during serialization)
+            try
+            {
+                timestamp = Application.isPlaying ? Time.time : 0f;
+            }
+            catch (UnityException)
+            {
+                // Called during serialization, use default
+                timestamp = 0f;
+            }
             intensity = intens;
             facePosition = Vector3.zero;
             faceRotation = Quaternion.identity;

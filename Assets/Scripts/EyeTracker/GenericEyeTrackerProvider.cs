@@ -26,22 +26,58 @@ namespace Voxon.EyeTracker
         private Vector3 GetMousePosition()
         {
 #if ENABLE_INPUT_SYSTEM
-            // Check if new Input System is actually available and mouse is present
+            // Try new Input System first
             try
             {
-                // Check if Input System is enabled and mouse device exists
-                if (UnityEngine.InputSystem.InputSystem.devices != null)
+                // Enable mouse device if needed
+                var mouse = UnityEngine.InputSystem.Mouse.current;
+                if (mouse == null)
                 {
-                    var mouse = UnityEngine.InputSystem.Mouse.current;
-                    if (mouse != null && mouse.position.isReadable)
+                    // Try to add/enable mouse device
+                    try
                     {
-                        return mouse.position.ReadValue();
+                        UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Mouse>();
+                        mouse = UnityEngine.InputSystem.Mouse.current;
+                    }
+                    catch
+                    {
+                        // Can't add device, continue to legacy
+                    }
+                }
+                
+                if (mouse != null)
+                {
+                    // Try to read mouse position
+                    try
+                    {
+                        if (mouse.position.enabled)
+                        {
+                            return mouse.position.ReadValue();
+                        }
+                        else
+                        {
+                            // Try to enable it
+                            mouse.position.Enable();
+                            return mouse.position.ReadValue();
+                        }
+                    }
+                    catch
+                    {
+                        // Position not readable, try value property
+                        try
+                        {
+                            return mouse.position.value;
+                        }
+                        catch
+                        {
+                            // Still failed, fall through
+                        }
                     }
                 }
             }
             catch
             {
-                // Fall through to legacy
+                // New Input System failed, fall through to legacy
             }
 #endif
             
@@ -52,13 +88,20 @@ namespace Voxon.EyeTracker
             }
             catch (System.InvalidOperationException)
             {
-                // New Input System is active but we can't access mouse
-                // Log warning only once to avoid spam
+                // New Input System is blocking legacy Input
+                // This means we're in "Input System Package (New)" mode
+                // We need to use new Input System, but mouse might not be initialized
+                
+                // Log warning only once with helpful message
                 if (!hasLoggedInputWarning)
                 {
-                    Debug.LogWarning("Input System: New Input System is active but mouse access failed. Using screen center for gaze simulation. This is normal if Input System package is installed but not fully configured.");
+                    Debug.LogWarning($"Input System: New Input System is active but mouse device not accessible. " +
+                        $"Gaze simulation will use screen center. To fix: Edit → Project Settings → Player → " +
+                        $"Active Input Handling → Set to 'Both' or 'Input Manager (Old)'");
                     hasLoggedInputWarning = true;
                 }
+                
+                // Return screen center as fallback
                 return new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
             }
         }

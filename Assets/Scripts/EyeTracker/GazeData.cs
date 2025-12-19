@@ -18,7 +18,7 @@ namespace Voxon.EyeTracker
         {
             gazeOrigin = Vector3.zero;
             gazeDirection = Vector3.forward;
-            timestamp = Application.isPlaying ? Time.time : 0f;
+            timestamp = 0f; // Set during runtime, not during serialization
             isValid = false;
         }
 
@@ -26,7 +26,16 @@ namespace Voxon.EyeTracker
         {
             gazeOrigin = origin;
             gazeDirection = direction.normalized;
-            timestamp = Application.isPlaying ? Time.time : 0f;
+            // Only set timestamp if actually playing (not during serialization)
+            try
+            {
+                timestamp = Application.isPlaying ? Time.time : 0f;
+            }
+            catch (UnityException)
+            {
+                // Called during serialization, use default
+                timestamp = 0f;
+            }
             isValid = valid;
         }
     }

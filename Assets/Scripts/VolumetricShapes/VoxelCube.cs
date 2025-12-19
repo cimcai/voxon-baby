@@ -30,7 +30,7 @@ namespace Voxon.VolumetricShapes
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        private new void OnValidate()
         {
             // Ensure mesh exists in editor
             if (!Application.isPlaying)
@@ -42,6 +42,7 @@ namespace Voxon.VolumetricShapes
                     CreateCubeMesh();
                 }
             }
+            base.OnValidate();
         }
         
         private void OnEnable()

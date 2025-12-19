@@ -220,7 +220,21 @@ namespace Voxon.FaceDetection
             // For now, simulate based on time and random factors
             // In production, replace this with actual ML analysis
             
-            float timeFactor = Application.isPlaying ? Mathf.Sin(Time.time * 0.5f) : 0f;
+            // Only use time factor if actually playing (not during serialization)
+            float timeFactor = 0f;
+            try
+            {
+                if (Application.isPlaying)
+                {
+                    timeFactor = Mathf.Sin(Time.time * 0.5f);
+                }
+            }
+            catch (UnityException)
+            {
+                // Called during serialization, use default
+                timeFactor = 0f;
+            }
+            
             float randomFactor = Random.Range(-0.3f, 0.3f);
             float combined = timeFactor + randomFactor;
 
@@ -246,9 +260,17 @@ namespace Voxon.FaceDetection
             }
 
             // Update if enough time passed (for stability)
-            if (Application.isPlaying && Time.time - lastExpressionChangeTime > expressionStabilityTime)
+            // Guard against serialization calls
+            try
             {
-                return true;
+                if (Application.isPlaying && Time.time - lastExpressionChangeTime > expressionStabilityTime)
+                {
+                    return true;
+                }
+            }
+            catch (UnityException)
+            {
+                // Called during serialization, skip time check
             }
 
             // Update if intensity changed significantly
