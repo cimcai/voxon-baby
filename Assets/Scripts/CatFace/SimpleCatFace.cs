@@ -1,4 +1,5 @@
 using UnityEngine;
+using Voxon.EyeTracker;
 
 namespace Voxon.CatFace
 {
@@ -15,6 +16,8 @@ namespace Voxon.CatFace
         [SerializeField] private GameObject rightEar;
         [SerializeField] private GameObject leftEye;
         [SerializeField] private GameObject rightEye;
+        [SerializeField] private GameObject leftPupil;
+        [SerializeField] private GameObject rightPupil;
         [SerializeField] private GameObject nose;
         [SerializeField] private GameObject mouth;
 
@@ -29,6 +32,11 @@ namespace Voxon.CatFace
         [SerializeField] private Color sadColor = Color.blue;
         [SerializeField] private Color surprisedColor = Color.white;
 
+        [Header("Gaze Following")]
+        [SerializeField] private bool followGaze = true;
+        [SerializeField] private float pupilMaxOffset = 0.03f; // Max distance pupil can move within eye
+        [SerializeField] private float gazeFollowSmoothing = 5f;
+
         private ExpressionManager expressionManager;
         private ExpressionType currentExpression = ExpressionType.Neutral;
         private Renderer headRenderer;
@@ -36,6 +44,10 @@ namespace Voxon.CatFace
         private Vector3 rightEarBaseRotation;
         private Vector3 leftEyeBaseScale;
         private Vector3 rightEyeBaseScale;
+        private Vector3 leftPupilBasePosition;
+        private Vector3 rightPupilBasePosition;
+        private EyeTrackerManager eyeTrackerManager;
+        private UnityEngine.Camera mainCamera;
 
         private void Awake()
         {
@@ -50,6 +62,12 @@ namespace Voxon.CatFace
             if (rightEar != null) rightEarBaseRotation = rightEar.transform.localEulerAngles;
             if (leftEye != null) leftEyeBaseScale = leftEye.transform.localScale;
             if (rightEye != null) rightEyeBaseScale = rightEye.transform.localScale;
+            if (leftPupil != null) leftPupilBasePosition = leftPupil.transform.localPosition;
+            if (rightPupil != null) rightPupilBasePosition = rightPupil.transform.localPosition;
+
+            // Get eye tracker and camera references
+            eyeTrackerManager = EyeTrackerManager.Instance;
+            mainCamera = UnityEngine.Camera.main;
 
             // Subscribe to expression changes
             if (expressionManager != null)
@@ -135,6 +153,47 @@ namespace Voxon.CatFace
                 }
             }
 
+            // Create pupils (small black spheres inside eyes)
+            if (leftPupil == null && leftEye != null)
+            {
+                leftPupil = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                leftPupil.name = "LeftPupil";
+                leftPupil.transform.SetParent(leftEye.transform);
+                leftPupil.transform.localPosition = Vector3.zero;
+                leftPupil.transform.localScale = Vector3.one * 0.4f; // Smaller than eye
+                var pupilRenderer = leftPupil.GetComponent<Renderer>();
+                if (pupilRenderer != null)
+                {
+                    pupilRenderer.material.color = Color.black;
+                }
+                // Remove collider so it doesn't interfere
+                var pupilCollider = leftPupil.GetComponent<Collider>();
+                if (pupilCollider != null)
+                {
+                    Destroy(pupilCollider);
+                }
+            }
+
+            if (rightPupil == null && rightEye != null)
+            {
+                rightPupil = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rightPupil.name = "RightPupil";
+                rightPupil.transform.SetParent(rightEye.transform);
+                rightPupil.transform.localPosition = Vector3.zero;
+                rightPupil.transform.localScale = Vector3.one * 0.4f; // Smaller than eye
+                var pupilRenderer = rightPupil.GetComponent<Renderer>();
+                if (pupilRenderer != null)
+                {
+                    pupilRenderer.material.color = Color.black;
+                }
+                // Remove collider so it doesn't interfere
+                var pupilCollider = rightPupil.GetComponent<Collider>();
+                if (pupilCollider != null)
+                {
+                    Destroy(pupilCollider);
+                }
+            }
+
             // Create nose (small sphere)
             if (nose == null)
             {
@@ -165,8 +224,8 @@ namespace Voxon.CatFace
                 }
             }
 
-            // Position the whole cat face in front of camera
-            transform.position = new Vector3(0, 1.5f, 3f);
+            // Position the whole cat face closer to camera
+            transform.position = new Vector3(0, 1.5f, 1.5f);
             transform.rotation = Quaternion.identity;
         }
 
@@ -181,6 +240,78 @@ namespace Voxon.CatFace
                     currentExpression = newExpression;
                     ApplyExpressionVisuals(currentExpression);
                 }
+            }
+
+            // Update pupil positions to follow gaze
+            if (followGaze)
+            {
+                UpdatePupilGaze();
+            }
+        }
+
+        private void UpdatePupilGaze()
+        {
+            if (eyeTrackerManager == null || !eyeTrackerManager.IsConnected())
+                return;
+
+            GazeData gazeData = eyeTrackerManager.GetGazeData();
+            if (!gazeData.isValid)
+                return;
+
+            // Calculate where the gaze ray hits (or would hit) in world space
+            // We'll use the gaze direction to determine where the cat should look
+            Vector3 gazeWorldPoint;
+            
+            // Cast ray from camera through gaze direction to find what the user is looking at
+            if (mainCamera != null)
+            {
+                // Convert gaze direction to world space relative to camera
+                Ray gazeRay = new Ray(gazeData.gazeOrigin, gazeData.gazeDirection);
+                
+                // Find intersection point at a reasonable distance (where objects might be)
+                float lookDistance = 5f;
+                gazeWorldPoint = gazeRay.origin + gazeRay.direction * lookDistance;
+            }
+            else
+            {
+                // Fallback: use gaze direction directly
+                gazeWorldPoint = transform.position + gazeData.gazeDirection * 5f;
+            }
+
+            // Update left pupil
+            if (leftPupil != null && leftEye != null)
+            {
+                Vector3 eyeWorldPos = leftEye.transform.position;
+                Vector3 lookDirection = (gazeWorldPoint - eyeWorldPos).normalized;
+                
+                // Convert to local space relative to eye
+                Vector3 localLookDirection = leftEye.transform.InverseTransformDirection(lookDirection);
+                
+                // Clamp the offset within the eye sphere
+                Vector3 targetOffset = Vector3.ClampMagnitude(localLookDirection * pupilMaxOffset, pupilMaxOffset);
+                
+                // Smoothly move towards target
+                Vector3 currentOffset = leftPupil.transform.localPosition;
+                Vector3 newOffset = Vector3.Lerp(currentOffset, targetOffset, Time.deltaTime * gazeFollowSmoothing);
+                leftPupil.transform.localPosition = newOffset;
+            }
+
+            // Update right pupil
+            if (rightPupil != null && rightEye != null)
+            {
+                Vector3 eyeWorldPos = rightEye.transform.position;
+                Vector3 lookDirection = (gazeWorldPoint - eyeWorldPos).normalized;
+                
+                // Convert to local space relative to eye
+                Vector3 localLookDirection = rightEye.transform.InverseTransformDirection(lookDirection);
+                
+                // Clamp the offset within the eye sphere
+                Vector3 targetOffset = Vector3.ClampMagnitude(localLookDirection * pupilMaxOffset, pupilMaxOffset);
+                
+                // Smoothly move towards target
+                Vector3 currentOffset = rightPupil.transform.localPosition;
+                Vector3 newOffset = Vector3.Lerp(currentOffset, targetOffset, Time.deltaTime * gazeFollowSmoothing);
+                rightPupil.transform.localPosition = newOffset;
             }
         }
 
