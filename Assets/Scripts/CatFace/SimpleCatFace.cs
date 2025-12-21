@@ -51,8 +51,27 @@ namespace Voxon.CatFace
 
         private void Awake()
         {
+            Debug.Log("SimpleCatFace.Awake called!");
+            
+            // Get camera reference early
+            mainCamera = UnityEngine.Camera.main;
+            
+            // Force creation even if parts exist (in case they're missing)
             CreateCatFace();
+            
             expressionManager = GetComponent<ExpressionManager>();
+            
+            Debug.Log($"SimpleCatFace.Awake: Cat face created. Head={head != null}, Position: {transform.position}");
+        }
+
+        private void OnEnable()
+        {
+            Debug.Log("SimpleCatFace.OnEnable called!");
+            // Ensure cat face is created when enabled
+            if (head == null)
+            {
+                CreateCatFace();
+            }
         }
 
         private void Start()
@@ -67,7 +86,21 @@ namespace Voxon.CatFace
 
             // Get eye tracker and camera references
             eyeTrackerManager = EyeTrackerManager.Instance;
-            mainCamera = UnityEngine.Camera.main;
+            if (mainCamera == null)
+            {
+                mainCamera = UnityEngine.Camera.main;
+            }
+
+            // Debug: Check if eyes and pupils were created
+            Debug.Log($"SimpleCatFace: Head={head != null}, LeftEye={leftEye != null}, RightEye={rightEye != null}, LeftPupil={leftPupil != null}, RightPupil={rightPupil != null}");
+            if (leftEye != null)
+            {
+                Debug.Log($"LeftEye position: {leftEye.transform.position}, scale: {leftEye.transform.localScale}");
+            }
+            if (rightEye != null)
+            {
+                Debug.Log($"RightEye position: {rightEye.transform.position}, scale: {rightEye.transform.localScale}");
+            }
 
             // Subscribe to expression changes
             if (expressionManager != null)
@@ -78,7 +111,9 @@ namespace Voxon.CatFace
 
         private void CreateCatFace()
         {
-            // Create head (sphere)
+            Debug.Log("SimpleCatFace: Starting to create cat face...");
+            
+            // Create head (sphere) - always recreate to ensure it exists
             if (head == null)
             {
                 head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -91,6 +126,7 @@ namespace Voxon.CatFace
                 {
                     headRenderer.material.color = headColor;
                 }
+                Debug.Log("SimpleCatFace: Head created");
             }
 
             // Create ears (scaled cubes)
@@ -124,19 +160,23 @@ namespace Voxon.CatFace
                 }
             }
 
-            // Create eyes (small spheres)
+            // Create eyes (larger, more visible spheres) - ALWAYS create
             if (leftEye == null)
             {
                 leftEye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 leftEye.name = "LeftEye";
                 leftEye.transform.SetParent(head.transform);
-                leftEye.transform.localPosition = new Vector3(-0.15f, 0.1f, 0.25f);
-                leftEye.transform.localScale = Vector3.one * 0.08f;
+                leftEye.transform.localPosition = new Vector3(-0.2f, 0.15f, 0.35f); // Even more forward
+                leftEye.transform.localScale = Vector3.one * 0.2f; // Even bigger eyes
                 var eyeRenderer = leftEye.GetComponent<Renderer>();
                 if (eyeRenderer != null)
                 {
                     eyeRenderer.material.color = eyeColor;
+                    // Make eyes more visible with emission
+                    eyeRenderer.material.EnableKeyword("_EMISSION");
+                    eyeRenderer.material.SetColor("_EmissionColor", eyeColor * 0.8f);
                 }
+                Debug.Log($"SimpleCatFace: LeftEye created at {leftEye.transform.position}, scale: {leftEye.transform.localScale}");
             }
 
             if (rightEye == null)
@@ -144,23 +184,27 @@ namespace Voxon.CatFace
                 rightEye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 rightEye.name = "RightEye";
                 rightEye.transform.SetParent(head.transform);
-                rightEye.transform.localPosition = new Vector3(0.15f, 0.1f, 0.25f);
-                rightEye.transform.localScale = Vector3.one * 0.08f;
+                rightEye.transform.localPosition = new Vector3(0.2f, 0.15f, 0.35f); // Even more forward
+                rightEye.transform.localScale = Vector3.one * 0.2f; // Even bigger eyes
                 var eyeRenderer = rightEye.GetComponent<Renderer>();
                 if (eyeRenderer != null)
                 {
                     eyeRenderer.material.color = eyeColor;
+                    // Make eyes more visible with emission
+                    eyeRenderer.material.EnableKeyword("_EMISSION");
+                    eyeRenderer.material.SetColor("_EmissionColor", eyeColor * 0.8f);
                 }
+                Debug.Log($"SimpleCatFace: RightEye created at {rightEye.transform.position}, scale: {rightEye.transform.localScale}");
             }
 
-            // Create pupils (small black spheres inside eyes)
-            if (leftPupil == null && leftEye != null)
+            // Create pupils (larger black spheres inside eyes) - ALWAYS create if eyes exist
+            if (leftEye != null && leftPupil == null)
             {
                 leftPupil = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 leftPupil.name = "LeftPupil";
                 leftPupil.transform.SetParent(leftEye.transform);
                 leftPupil.transform.localPosition = Vector3.zero;
-                leftPupil.transform.localScale = Vector3.one * 0.4f; // Smaller than eye
+                leftPupil.transform.localScale = Vector3.one * 0.6f; // Even larger pupils
                 var pupilRenderer = leftPupil.GetComponent<Renderer>();
                 if (pupilRenderer != null)
                 {
@@ -172,15 +216,16 @@ namespace Voxon.CatFace
                 {
                     Destroy(pupilCollider);
                 }
+                Debug.Log("SimpleCatFace: LeftPupil created");
             }
 
-            if (rightPupil == null && rightEye != null)
+            if (rightEye != null && rightPupil == null)
             {
                 rightPupil = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 rightPupil.name = "RightPupil";
                 rightPupil.transform.SetParent(rightEye.transform);
                 rightPupil.transform.localPosition = Vector3.zero;
-                rightPupil.transform.localScale = Vector3.one * 0.4f; // Smaller than eye
+                rightPupil.transform.localScale = Vector3.one * 0.6f; // Even larger pupils
                 var pupilRenderer = rightPupil.GetComponent<Renderer>();
                 if (pupilRenderer != null)
                 {
@@ -192,7 +237,10 @@ namespace Voxon.CatFace
                 {
                     Destroy(pupilCollider);
                 }
+                Debug.Log("SimpleCatFace: RightPupil created");
             }
+            
+            Debug.Log($"SimpleCatFace: Cat face creation complete. Eyes: L={leftEye != null}, R={rightEye != null}, Pupils: L={leftPupil != null}, R={rightPupil != null}");
 
             // Create nose (small sphere)
             if (nose == null)
@@ -224,9 +272,27 @@ namespace Voxon.CatFace
                 }
             }
 
-            // Position the whole cat face closer to camera
+            // Position the whole cat face closer to camera and make sure it faces forward
             transform.position = new Vector3(0, 1.5f, 1.5f);
             transform.rotation = Quaternion.identity;
+            
+            // Make sure the cat faces the camera
+            if (mainCamera != null)
+            {
+                Vector3 directionToCamera = mainCamera.transform.position - transform.position;
+                directionToCamera.y = 0; // Keep head level
+                if (directionToCamera != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(-directionToCamera);
+                }
+            }
+            else
+            {
+                // If no camera, just face forward (negative Z)
+                transform.rotation = Quaternion.LookRotation(Vector3.back);
+            }
+            
+            Debug.Log($"SimpleCatFace: Final position: {transform.position}, rotation: {transform.rotation.eulerAngles}");
         }
 
         private void Update()
