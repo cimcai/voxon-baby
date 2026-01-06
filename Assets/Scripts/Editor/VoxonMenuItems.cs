@@ -166,6 +166,45 @@ namespace Voxon.Editor
             Debug.Log("Cat Face Controller created with SimpleCatFace placeholder. The cat should be visible in the scene!");
         }
 
+        [MenuItem("Voxon/Create/Baby Face Model Setup", false, 22)]
+        static void CreateBabyFaceModelSetup()
+        {
+            GameObject babyFace = GameObject.Find("BabyFace");
+            if (babyFace == null)
+            {
+                babyFace = new GameObject("BabyFace");
+            }
+            
+            // Add required components
+            BabyFaceModel babyModel = babyFace.GetComponent<BabyFaceModel>();
+            if (babyModel == null)
+            {
+                babyModel = babyFace.AddComponent<BabyFaceModel>();
+            }
+            
+            ExpressionManager expressionManager = babyFace.GetComponent<ExpressionManager>();
+            if (expressionManager == null)
+            {
+                expressionManager = babyFace.AddComponent<ExpressionManager>();
+            }
+            
+            CatFaceController controller = babyFace.GetComponent<CatFaceController>();
+            if (controller == null)
+            {
+                controller = babyFace.AddComponent<CatFaceController>();
+            }
+            
+            Selection.activeGameObject = babyFace;
+            Undo.RegisterCreatedObjectUndo(babyFace, "Create Baby Face Model Setup");
+            EditorSceneManager.MarkSceneDirty(babyFace.scene);
+            Debug.Log("Baby Face Model setup created! Next steps:\n" +
+                      "1. Import your baby face FBX model into Assets/Models/BabyFace/\n" +
+                      "2. Drag the model into the scene as a child of BabyFace\n" +
+                      "3. Assign the SkinnedMeshRenderer to BabyFaceModel component\n" +
+                      "4. Configure blend shapes or eye bones\n" +
+                      "5. See IMPORT_BABY_FACE_GUIDE.md for detailed instructions");
+        }
+
         [MenuItem("Voxon/Create/Face Detection/WebCam Provider", false, 31)]
         static void CreateWebCamFaceProvider()
         {

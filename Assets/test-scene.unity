@@ -559,6 +559,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1455523685
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1455523688}
+  - component: {fileID: 1455523687}
+  - component: {fileID: 1455523686}
+  m_Layer: 0
+  m_Name: CatFace
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1455523686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455523685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4179b0ff1a864ff7ba3966ee7e0c0f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  head: {fileID: 0}
+  leftEar: {fileID: 0}
+  rightEar: {fileID: 0}
+  leftEye: {fileID: 0}
+  rightEye: {fileID: 0}
+  leftPupil: {fileID: 0}
+  rightPupil: {fileID: 0}
+  nose: {fileID: 0}
+  mouth: {fileID: 0}
+  headColor: {r: 0.8, g: 0.6, b: 0.4, a: 1}
+  eyeColor: {r: 0, g: 1, b: 0, a: 1}
+  noseColor: {r: 0, g: 0, b: 0, a: 1}
+  useColorForExpressions: 1
+  happyColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  sadColor: {r: 0, g: 0, b: 1, a: 1}
+  surprisedColor: {r: 1, g: 1, b: 1, a: 1}
+  followGaze: 1
+  pupilMaxOffset: 0.03
+  gazeFollowSmoothing: 5
+--- !u!114 &1455523687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455523685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2413073e4711541b0a267913449a58e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableCatFace: 1
+  defaultPosition: {x: 0, y: 0, z: 0}
+  defaultRotation: {x: 0, y: 0, z: 0, w: 1}
+  expressionManager: {fileID: 0}
+  gazeHandler: {fileID: 0}
+  expressionTriggers: {fileID: 0}
+  llmMapper: {fileID: 0}
+--- !u!4 &1455523688
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455523685}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1701452953
 Material:
   serializedVersion: 8
@@ -686,6 +769,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   focusDwellTime: 0.5
   unfocusTime: 0.2
+  debugLogging: 0
 --- !u!114 &2127619134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,3 +812,4 @@ SceneRoots:
   - {fileID: 2127619135}
   - {fileID: 53829726}
   - {fileID: 1343918316}
+  - {fileID: 1455523688}

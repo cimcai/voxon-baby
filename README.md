@@ -64,12 +64,22 @@ voxon/
 2. Ensure each shape has a Collider component (automatically added)
 3. Add `HighlightController` to shapes for highlighting effects
 
-#### Cat Face Setup (Optional)
+#### Cat Face / Baby Face Setup (Optional)
 
-1. Create a GameObject for the cat face
-2. Add `CatFaceController` component
-3. Configure expression settings in the inspector
-4. Ensure you have a 3D cat face model with blend shapes or animation support
+**Option 1: Simple Cat Face (Placeholder)**
+1. Voxon → Create → Cat Face Controller
+2. Uses Unity primitives for quick testing
+3. Automatically creates visible cat face in scene
+
+**Option 2: Imported 3D Model (Recommended)**
+1. Import a baby face or cat face 3D model (FBX format)
+   - See `BABY_FACE_MODELS.md` for model recommendations
+   - See `IMPORT_BABY_FACE_GUIDE.md` for detailed import instructions
+2. Voxon → Create → Baby Face Model Setup
+3. Drag your imported model into the scene as a child of the BabyFace GameObject
+4. Assign the `SkinnedMeshRenderer` to the `BabyFaceModel` component
+5. Configure blend shapes or eye bones for expressions and gaze tracking
+6. Models with blend shapes work best for facial expressions
 
 #### Face Detection Setup
 

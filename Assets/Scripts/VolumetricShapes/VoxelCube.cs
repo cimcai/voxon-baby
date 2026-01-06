@@ -72,28 +72,81 @@ namespace Voxon.VolumetricShapes
                 meshRenderer = gameObject.AddComponent<MeshRenderer>();
             }
 
-            // Create a simple cube mesh
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Mesh cubeMesh = cube.GetComponent<MeshFilter>().sharedMesh;
-            meshFilter.mesh = cubeMesh;
-            
-            // Copy material before destroying
-            Material cubeMaterial = cube.GetComponent<MeshRenderer>().sharedMaterial;
-            if (cubeMaterial != null)
-            {
-                meshRenderer.material = new Material(cubeMaterial);
-            }
-            else
-            {
-                // Create a default material if none exists
-                meshRenderer.material = new Material(Shader.Find("Standard"));
-                meshRenderer.material.color = baseColor;
-            }
-            
-            DestroyImmediate(cube);
+            Mesh mesh = new Mesh();
+            mesh.name = "VoxelCube";
 
-            // Apply size
-            transform.localScale = dimensions * size;
+            float scaledX = dimensions.x * size * 0.5f;
+            float scaledY = dimensions.y * size * 0.5f;
+            float scaledZ = dimensions.z * size * 0.5f;
+
+            // 8 vertices for a cube
+            Vector3[] vertices = new Vector3[]
+            {
+                // Bottom face
+                new Vector3(-scaledX, -scaledY, -scaledZ), // 0
+                new Vector3(scaledX, -scaledY, -scaledZ),  // 1
+                new Vector3(scaledX, -scaledY, scaledZ),   // 2
+                new Vector3(-scaledX, -scaledY, scaledZ),   // 3
+                // Top face
+                new Vector3(-scaledX, scaledY, -scaledZ),   // 4
+                new Vector3(scaledX, scaledY, -scaledZ),    // 5
+                new Vector3(scaledX, scaledY, scaledZ),     // 6
+                new Vector3(-scaledX, scaledY, scaledZ)     // 7
+            };
+
+            // 6 faces * 2 triangles * 3 vertices = 36 indices
+            int[] triangles = new int[]
+            {
+                // Bottom face
+                0, 2, 1,
+                0, 3, 2,
+                // Top face
+                4, 5, 6,
+                4, 6, 7,
+                // Front face
+                3, 7, 6,
+                3, 6, 2,
+                // Back face
+                0, 1, 5,
+                0, 5, 4,
+                // Left face
+                0, 4, 7,
+                0, 7, 3,
+                // Right face
+                1, 2, 6,
+                1, 6, 5
+            };
+
+            // Proper UV mapping for each face
+            Vector2[] uvs = new Vector2[]
+            {
+                // Bottom face
+                new Vector2(0, 0), // 0
+                new Vector2(1, 0), // 1
+                new Vector2(1, 1), // 2
+                new Vector2(0, 1), // 3
+                // Top face
+                new Vector2(0, 0), // 4
+                new Vector2(1, 0), // 5
+                new Vector2(1, 1), // 6
+                new Vector2(0, 1)  // 7
+            };
+
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.uv = uvs;
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            mesh.RecalculateBounds();
+
+            meshFilter.mesh = mesh;
+
+            // Setup material
+            if (meshRenderer.material == null)
+            {
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+            }
+            meshRenderer.material.color = baseColor;
             
             // Position cube in front of camera if at origin (only in editor)
 #if UNITY_EDITOR

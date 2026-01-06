@@ -91,6 +91,7 @@
     <Compile Include="Assets/Scripts/FaceDetection/WebCamFaceProvider.cs" />
     <Compile Include="Assets/Scripts/EyeTracker/GenericEyeTrackerProvider.cs" />
     <Compile Include="Assets/Scripts/GazeDetection/GazeRaycast.cs" />
+    <Compile Include="Assets/Scripts/CatFace/BabyFaceModel.cs" />
     <Compile Include="Assets/Scripts/FaceDetection/HumanExpressionData.cs" />
     <Compile Include="Assets/Scripts/EyeTracker/ExampleProviders/PupilLabsEyeTrackerProvider.cs" />
     <Compile Include="Assets/Scripts/Utilities/ShapeAnimator.cs" />

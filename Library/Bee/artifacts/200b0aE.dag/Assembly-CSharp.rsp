@@ -353,6 +353,7 @@
 -analyzer:"/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 "Assets/Scripts/Camera/EyeTrackerCamera.cs"
+"Assets/Scripts/CatFace/BabyFaceModel.cs"
 "Assets/Scripts/CatFace/CatFaceController.cs"
 "Assets/Scripts/CatFace/CatFaceExpression.cs"
 "Assets/Scripts/CatFace/ExpressionManager.cs"
